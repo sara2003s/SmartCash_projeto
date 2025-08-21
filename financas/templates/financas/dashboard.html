@@ -1,39 +1,34 @@
 {% extends "financas/base.html" %}
 {% load static %}
+{% load humanize %}
 
 {% block title %}Dashboard - SmartCash{% endblock %}
 
 {% block content %}
 <div class="container mx-auto">
 
-    <!-- Título -->
     <h1 class="text-3xl font-bold mb-2">Olá, {{ user.first_name|default:"Sara" }}! 👋</h1>
     <p class="text-gray-500 mb-6">Aqui está um resumo da sua situação financeira atual.</p>
 
-    <!-- Cards -->
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-        <!-- Saldo -->
         <div class="bg-white shadow rounded p-4">
             <h2 class="text-gray-600">Saldo Atual</h2>
             <p class="text-2xl font-bold text-green-600">R$ {{ saldo }}</p>
             <p class="text-sm text-gray-500">↗ Você tem R$ 15k guardados e economiza R$ 1k/mês</p>
         </div>
 
-        <!-- Receitas -->
         <div class="bg-white shadow rounded p-4">
             <h2 class="text-gray-600">Receitas</h2>
             <p class="text-2xl font-bold text-blue-600">R$ {{ entradas }}</p>
             <p class="text-sm text-gray-500">Recebe R$ 4k por mês entre salário e freelas</p>
         </div>
 
-        <!-- Gastos -->
         <div class="bg-white shadow rounded p-4">
             <h2 class="text-gray-600">Gastos</h2>
             <p class="text-2xl font-bold text-red-600">R$ {{ saidas }}</p>
             <p class="text-sm text-gray-500">↘ Gasta R$ 3k em moradia, alimentação e transporte</p>
         </div>
 
-        <!-- Meta -->
         <div class="bg-white shadow rounded p-4">
             <h2 class="text-gray-600">Meta de Economia</h2>
             <p class="text-2xl font-bold text-purple-600">R$ {{ meta }}</p>
@@ -44,19 +39,15 @@
         </div>
     </div>
 
-    <!-- Gráfico + Recomendações -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-        <!-- Gráfico -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
         <div class="bg-white shadow rounded p-6">
             <h2 class="text-xl font-bold mb-4">Evolução Financeira</h2>
             <canvas id="financeChart" class="h-64"></canvas>
         </div>
 
-        <!-- Recomendações -->
-        <div class="bg-white shadow rounded p-6">
+        <div class="col-span-1 bg-white p-6 rounded-lg shadow flex flex-col justify-between h-full">
             <h2 class="text-xl font-bold mb-4">Recomendações Inteligentes</h2>
-            <ul class="space-y-3">
+            <ul class="space-y-3 flex-1">
                 <li class="p-3 bg-white-50 border border-red-200 rounded">
                     ⚠️ <strong>Atenção:</strong>
                     <h2>Gastos com alimentação representam 37% das despesas.</h2>
@@ -74,62 +65,143 @@
                     🛡️ <strong>Oportunidade de economia em gastos variáveis:</strong>
                     <h2>Construa sua reserva de emergência (6 meses de gastos).</h2>
                 </li>
-                <li class="p-3 bg-[#f6f6ff] border border-[#f6f6ff] rounded">
+                <li class="p-3 bg-[#f6f6ff] border border-[#f6f6ff] rounded mt-auto">
                     <div class="flex justify-between items-center p-4 rounded">
                         <div>
                             <h1 class="text-lg font-medium">Análises mais detalhadas:</h1>
                             <p class="text-gray-600">Upgrade para Pro e acesse relatórios completos em PDF.</p>
                         </div>
-                        <button
-                            class="flex gap-4 items-center ml-auto px-4 py-2 bg-[#262d3f] text-white rounded">Upgrade</button>
+                        <button class="flex gap-4 items-center ml-auto px-4 py-2 bg-[#262d3f] text-white rounded">
+                            Upgrade
                         </button>
                     </div>
-
+                </li>
             </ul>
         </div>
-        
-    </div>
-    <div class="grid grid-cols-1 gap-6">
 
-        <!-- Gráfico de pizza -->
-        <div class="bg-white p-6 rounded shadow max-w-md gap-4 mt-6">
-                    <h2 class="text-xl font-bold mb-2">Distribuição de Gastos</h2>
-                    <p class="text-gray-600 mb-4">Onde você mais gastou este mês</p>
-                    <canvas id="expensesPieChart"></canvas>
-               
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-lg font-semibold mb-2">Distribuição de Gastos</h2>
+            <p class="text-sm text-gray-500 mb-4">Veja como seus gastos estão distribuídos por categoria</p>
+            <canvas id="expensesPieChart" class="h-64"></canvas>
         </div>
 
-        <!-- Chart.js -->
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script>
-            const ctxFinance = document.getElementById('financeChart');
-            new Chart(ctxFinance, {
-                type: 'bar',
-                data: {
-                    labels: ['Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago'],
-                    datasets: [
-                        {
-                            label: 'Receitas',
-                            data: [8000, 8500, 8200, 8700, 8800, 9000],
-                            backgroundColor: '#34d399'
-                        },
-                        {
-                            label: 'Gastos',
-                            data: [3000, 3200, 3100, 3400, 3300, 3250],
-                            backgroundColor: '#f87171'
-                        }
-                    ]
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-lg font-semibold mb-2">Transações Recentes</h2>
+            <p class="text-sm text-gray-500 mb-4">Suas últimas movimentações financeiras</p>
+            <div class="text-sm">
+            </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h2 class="text-lg font-semibold mb-2">Gastos por Categoria</h2>
+            <p class="text-sm text-gray-500 mb-4">Distribuição dos seus gastos este mês</p>
+            <select class="border rounded p-2">
+                <option>Selecione o mês</option>
+                <option>Janeiro 2025</option>
+                <option>Fevereiro 2025</option>
+                <option>Março 2025</option>
+                <option>Abril 2025</option>
+                <option>Maio 2025</option>
+                <option>Junho 2025</option>
+            </select>
+            <div class="space-y-4">
+                {% for item in gastos_detalhados %}
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <span class="inline-block h-3 w-3 rounded-full"
+                            style="background-color: {{ item.cor }};"></span>
+                        <span>{{ item.nome }}</span>
+                    </div>
+                    <div class="text-right">
+                        <p class="font-semibold">R$ {{ item.valor|floatformat:2|intcomma }}</p>
+                        <p class="text-xs text-gray-500">{{ item.porcentagem|floatformat:0 }}%</p>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-gray-500 text-center">Nenhum gasto encontrado para este período.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{{ expenses_labels|json_script:"expenses-labels" }}
+{{ expenses_data|json_script:"expenses-data" }}
+<script>
+    // Gráfico de Evolução Financeira (Barras)
+    const ctx = document.getElementById('financeChart');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago'],
+            datasets: [
+                {
+                    label: 'Receitas',
+                    data: [8000, 8500, 8200, 8700, 8800, 9000],
+                    backgroundColor: '#34d399'
                 },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: { position: 'bottom' }
+                {
+                    label: 'Gastos',
+                    data: [3000, 3200, 3100, 3400, 3300, 3250],
+                    backgroundColor: '#f87171'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { position: 'bottom' }
+            }
+        }
+    });
+
+    // Gráfico de Distribuição de Gastos (Pizza)
+    const expensesLabels = JSON.parse(document.getElementById('expenses-labels').textContent);
+    const expensesData = JSON.parse(document.getElementById('expenses-data').textContent);
+
+    if (expensesData && expensesData.length > 0) {
+        const ctxPie = document.getElementById('expensesPieChart');
+        new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: expensesLabels,
+                datasets: [{
+                    label: 'Distribuição de Gastos',
+                    data: expensesData,
+                    backgroundColor: [
+                        '#f87171',
+                        '#f9a8d4',
+                        '#fde047',
+                        '#60a5fa',
+                        '#a5b4fc',
+                    ],
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    tooltip: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                let label = tooltipItem.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (tooltipItem.raw !== null) {
+                                    const total = tooltipItem.chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
+                                    const percentage = ((tooltipItem.raw / total) * 100).toFixed(0);
+                                    label += `${percentage}%`;
+                                }
+                                return label;
+                            }
+                        }
                     }
                 }
-            });
-
-
-
-
-        </script>
-        {% endblock %}
+            }
+        });
+    }
+</script>
+{% endblock %}
